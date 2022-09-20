@@ -7,6 +7,7 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.testedelivey.exception.AutenticacaoException;
@@ -26,8 +27,11 @@ public class FuncionarioService implements IFuncionarioService {
 	@Autowired
 	private FuncionarioRepository repository;
 	
-	public FuncionarioService(FuncionarioRepository repository) {
+	private PasswordEncoder encoder;
+	
+	public FuncionarioService(FuncionarioRepository repository, PasswordEncoder encoder) {
 		this.repository = repository;
+		this.encoder = encoder;
 	}
 	
 	@Override
@@ -41,9 +45,16 @@ public class FuncionarioService implements IFuncionarioService {
 	}
 	
 	@Transactional
-	public Funcionario cadastrarFuncionario(Funcionario Funcionario) {
-		validarFuncionario(Funcionario);
-		return repository.save(Funcionario);
+	public Funcionario cadastrarFuncionario(Funcionario funcionario) {
+		validarFuncionario(funcionario);
+		criptografarSenha(funcionario);
+		return repository.save(funcionario);
+	}
+	
+	private void criptografarSenha(Funcionario funcionario) { 
+		String senha = funcionario.getSenha();
+		String senhaCripto = encoder.encode(senha);
+		funcionario.setSenha(senhaCripto);
 	}
 
 	@Override
@@ -55,7 +66,9 @@ public class FuncionarioService implements IFuncionarioService {
 			throw new AutenticacaoException(USER_NAO_ENCONTRADO);
 		}
 		
-		if(!senha.trim().equals(usuario.get().getSenha().trim())){
+		boolean senhasIguais = encoder.matches(senha, usuario.get().getSenha());
+
+		if (!senhasIguais) {
 			throw new AutenticacaoException(SENHA_INCORRETA);
 		}
 		
@@ -64,26 +77,26 @@ public class FuncionarioService implements IFuncionarioService {
 	
 	@Override
 	@Transactional
-	public Funcionario atualizarFuncionario(Funcionario Funcionario) {
-		Objects.requireNonNull(Funcionario.getId());
-		validarFuncionario(Funcionario);
-		return repository.save(Funcionario);
+	public Funcionario atualizarFuncionario(Funcionario funcionario) {
+		Objects.requireNonNull(funcionario.getId());
+		validarFuncionario(funcionario);
+		return repository.save(funcionario);
 	}
 
 	@Override
 	@Transactional
-	public void deletarFuncionario(Funcionario Funcionario) {
-		Objects.requireNonNull(Funcionario.getId());
-		repository.delete(Funcionario);
+	public void deletarFuncionario(Funcionario funcionario) {
+		Objects.requireNonNull(funcionario.getId());
+		repository.delete(funcionario);
 	}
 	
 	@Override
-	public void validarFuncionario(Funcionario Funcionario) {
-		if(Funcionario.getNome() == null || Funcionario.getNome().trim().equals("")) {
+	public void validarFuncionario(Funcionario funcionario) {
+		if(funcionario.getNome() == null || funcionario.getNome().trim().equals("")) {
 			throw new RegraNegocioException(NOME_INVALIDO);
 		}
 		
-		if(Funcionario.getSenha() == null || Funcionario.getSenha().toString().length() > 6) {
+		if(funcionario.getSenha() == null || funcionario.getSenha().toString().length() > 6) {
 			throw new RegraNegocioException(SENHA_INVALIDA);
 		}
 		

@@ -3,8 +3,8 @@ package com.testedelivey.service;
 import java.util.List;
 import java.util.Optional;
 
-import com.testedelivey.model.EnumStatusPedido;
 import com.testedelivey.model.entity.Pedido;
+import com.testedelivey.model.enuns.EnumStatusPedido;
 
 public interface IPedidoService {
 	

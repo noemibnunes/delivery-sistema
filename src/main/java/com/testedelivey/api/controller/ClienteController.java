@@ -15,10 +15,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.testedelivey.api.dto.ClienteDTO;
+import com.testedelivey.api.dto.TokenDTO;
 import com.testedelivey.exception.AutenticacaoException;
 import com.testedelivey.exception.RegraNegocioException;
 import com.testedelivey.model.entity.Cliente;
 import com.testedelivey.service.implementacao.ClienteService;
+import com.testedelivey.service.implementacao.JwtService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,6 +32,8 @@ public class ClienteController {
 	private static final String USER_NAO_ENCONTRADO = "Usuário não encontrado!";
 
 	private final ClienteService service;
+	
+	private final JwtService jwtService;
 	
 	@GetMapping()
 	public List<Cliente> findAll() {
@@ -56,7 +60,9 @@ public class ClienteController {
 	public ResponseEntity<?> autenticar(@RequestBody ClienteDTO dto) {
 		try {
 			Cliente userAutenticado = service.autenticarUsuario(dto.getEmail(), dto.getSenha().trim());
-			return ResponseEntity.ok(userAutenticado);
+			String token = jwtService.gerarToken(userAutenticado);
+			TokenDTO tokenDTO = new TokenDTO(userAutenticado.getNome(), token);
+			return ResponseEntity.ok(tokenDTO);
 		}catch (AutenticacaoException e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}

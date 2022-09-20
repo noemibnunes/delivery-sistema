@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.testedelivey.api.dto.AtualizarStatusDTO;
 import com.testedelivey.api.dto.PedidoDTO;
 import com.testedelivey.exception.RegraNegocioException;
-import com.testedelivey.model.EnumStatusPedido;
 import com.testedelivey.model.entity.Cliente;
 import com.testedelivey.model.entity.Pedido;
+import com.testedelivey.model.enuns.EnumStatusPedido;
 import com.testedelivey.service.implementacao.ClienteService;
 import com.testedelivey.service.implementacao.PedidoService;
 

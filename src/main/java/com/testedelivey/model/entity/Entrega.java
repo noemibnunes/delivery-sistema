@@ -12,12 +12,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
-import com.testedelivey.model.EnumStatusEntrega;
+import com.testedelivey.model.enuns.EnumStatusEntrega;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

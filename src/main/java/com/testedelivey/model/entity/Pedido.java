@@ -17,7 +17,7 @@ import javax.persistence.Table;
 
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
-import com.testedelivey.model.EnumStatusPedido;
+import com.testedelivey.model.enuns.EnumStatusPedido;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

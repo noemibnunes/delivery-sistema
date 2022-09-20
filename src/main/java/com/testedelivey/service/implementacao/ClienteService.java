@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.testedelivey.exception.AutenticacaoException;
@@ -19,55 +20,67 @@ import com.testedelivey.service.IClienteService;
 
 @Service
 public class ClienteService implements IClienteService {
-	
+
 	@Autowired
 	private ClienteRepository repository;
-	
-	public ClienteService(ClienteRepository repository) {
+
+	private PasswordEncoder encoder;
+
+	public ClienteService(ClienteRepository repository, PasswordEncoder encoder) {
 		this.repository = repository;
+		this.encoder = encoder;
 	}
-	
+
 	@Override
 	public Optional<Cliente> obterPorId(Long id) {
 		return repository.findById(id);
 	}
-	
+
 	@Override
 	public List<Cliente> obterPorTodos() {
 		return repository.findAll();
 	}
-	
+
 	@Transactional
 	public Cliente cadastrarUsuario(Cliente cliente) {
 		validarEmail(cliente.getEmail());
+		criptografarSenha(cliente);
 		return repository.save(cliente);
+	}
+
+	private void criptografarSenha(Cliente cliente) {
+		String senha = cliente.getSenha();
+		String senhaCripto = encoder.encode(senha);
+		cliente.setSenha(senhaCripto);
 	}
 
 	@Override
 	public void validarEmail(String email) {
 		boolean existe = repository.existsByEmail(email);
-		
-		if(existe) {
+
+		if (existe) {
 			throw new RegraNegocioException("Email já cadastrado!");
 		}
 	}
-	
+
 	@Override
 	public Cliente autenticarUsuario(String email, String senha) {
-		
-		Optional<Cliente> usuario = repository.findByEmail(email); 
-		
-		if(!usuario.isPresent()) {
+
+		Optional<Cliente> usuario = repository.findByEmail(email);
+
+		if (!usuario.isPresent()) {
 			throw new AutenticacaoException("Usuário não encontrado para o email informado!");
 		}
-		
-		if(!senha.trim().equals(usuario.get().getSenha().trim())){
+
+		boolean senhasIguais = encoder.matches(senha, usuario.get().getSenha());
+
+		if (!senhasIguais) {
 			throw new AutenticacaoException("Senha Inválida!");
 		}
 		
 		return usuario.get();
 	}
-	
+
 	@Override
 	@Transactional
 	public Cliente atualizarCliente(Cliente cliente) {
@@ -82,48 +95,47 @@ public class ClienteService implements IClienteService {
 		Objects.requireNonNull(cliente.getId());
 		repository.delete(cliente);
 	}
-	
+
 	@Override
 	public void validarUsuario(Cliente cliente) {
-		if(cliente.getNome() == null || cliente.getNome().trim().equals("")) {
+		if (cliente.getNome() == null || cliente.getNome().trim().equals("")) {
 			throw new RegraNegocioException("Informe um Nome válido!");
 		}
-		
-		if(cliente.getEndereco() == null) {
+
+		if (cliente.getEndereco() == null) {
 			throw new RegraNegocioException("Informe um Endereço!");
 		}
-		
-		if(cliente.getTelefone() == null || cliente.getTelefone().matches("[0-9]*")) {
+
+		if (cliente.getTelefone() == null || cliente.getTelefone().matches("[0-9]*")) {
 			throw new RegraNegocioException("Informe um Telefone!");
 		}
-		
-		if(cliente.getSenha() == null || cliente.getSenha().toString().length() > 6) {
+
+		if (cliente.getSenha() == null || cliente.getSenha().toString().length() > 6) {
 			throw new RegraNegocioException("Informe uma Senha válida!");
 		}
-		
-		if(cliente.getEmail() == null) {
+
+		if (cliente.getEmail() == null) {
 			throw new RegraNegocioException("Informe um Email!");
 		}
-		
-		if(cliente.getEmail() != null) {
-			if(!isEmailValido(cliente.getEmail())){
+
+		if (cliente.getEmail() != null) {
+			if (!isEmailValido(cliente.getEmail())) {
 				throw new RegraNegocioException("Informe um Email válido!");
 			}
 		}
 	}
-	
-	public static boolean isEmailValido(String email) {
-        boolean isEmailValido = false;
-        if (email != null && email.length() > 0) {
-            String expression = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$";
-            Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);
-            Matcher matcher = pattern.matcher(email);
-            if (matcher.matches()) {
-            	isEmailValido = true;
-            }
-        }
-        return isEmailValido;
-    }
 
+	public static boolean isEmailValido(String email) {
+		boolean isEmailValido = false;
+		if (email != null && email.length() > 0) {
+			String expression = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$";
+			Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);
+			Matcher matcher = pattern.matcher(email);
+			if (matcher.matches()) {
+				isEmailValido = true;
+			}
+		}
+		return isEmailValido;
+	}
 
 }

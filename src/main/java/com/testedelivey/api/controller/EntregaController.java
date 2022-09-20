@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.testedelivey.api.dto.AtualizarStatusDTO;
 import com.testedelivey.api.dto.EntregaDTO;
 import com.testedelivey.exception.RegraNegocioException;
-import com.testedelivey.model.EnumStatusEntrega;
 import com.testedelivey.model.entity.Entrega;
 import com.testedelivey.model.entity.Funcionario;
 import com.testedelivey.model.entity.Pedido;
+import com.testedelivey.model.enuns.EnumStatusEntrega;
 import com.testedelivey.service.implementacao.EntregaService;
 import com.testedelivey.service.implementacao.FuncionarioService;
 import com.testedelivey.service.implementacao.PedidoService;
@@ -64,10 +64,10 @@ public class EntregaController {
 	public ResponseEntity<?> atualizarEntrega(@PathVariable("id") Long id, @RequestBody EntregaDTO dto) {
 		return service.obterPorId(id).map(entity -> {
 			try {
-				Entrega Entrega = converterDTO(dto);
-				Entrega.setId(entity.getId());
-				service.atualizarEntrega(Entrega);
-				return ResponseEntity.ok(Entrega);
+				Entrega entrega = converterDTO(dto);
+				entrega.setId(entity.getId());
+				service.atualizarEntrega(entrega);
+				return ResponseEntity.ok(entrega);
 			} catch (Exception e) {
 				return ResponseEntity.badRequest().body(e.getMessage());
 			}
@@ -104,15 +104,6 @@ public class EntregaController {
 		}).orElseGet(() -> new ResponseEntity<>(ENTREGA_NAO_ATUALIZADA, HttpStatus.BAD_REQUEST));
 	}
 
-	private EntregaDTO converter(Entrega entrega) {
-		return EntregaDTO.builder()
-				.id(entrega.getId())
-				.status(entrega.getStatus().name())
-				.pedido(entrega.getPedido().getId())
-				.funcionario(entrega.getFuncionario().getId())
-				.build();
-	}
-	
 	private Entrega converterDTO(EntregaDTO dto) {
 		Entrega entrega = new Entrega();
 		entrega.setId(dto.getId());

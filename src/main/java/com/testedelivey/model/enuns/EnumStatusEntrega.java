@@ -1,4 +1,4 @@
-package com.testedelivey.model;
+package com.testedelivey.model.enuns;
 
 public enum EnumStatusEntrega {
 	

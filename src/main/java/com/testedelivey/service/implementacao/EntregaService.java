@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.testedelivey.exception.RegraNegocioException;
-import com.testedelivey.model.EnumStatusEntrega;
 import com.testedelivey.model.entity.Entrega;
+import com.testedelivey.model.enuns.EnumStatusEntrega;
 import com.testedelivey.model.repository.EntregaRepository;
 import com.testedelivey.service.IEntregaService;
 

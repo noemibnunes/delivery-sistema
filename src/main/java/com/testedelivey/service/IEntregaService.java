@@ -2,8 +2,8 @@ package com.testedelivey.service;
 
 import java.util.Optional;
 
-import com.testedelivey.model.EnumStatusEntrega;
 import com.testedelivey.model.entity.Entrega;
+import com.testedelivey.model.enuns.EnumStatusEntrega;
 
 public interface IEntregaService {
 

@@ -14,8 +14,8 @@ import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.stereotype.Service;
 
 import com.testedelivey.exception.RegraNegocioException;
-import com.testedelivey.model.EnumStatusPedido;
 import com.testedelivey.model.entity.Pedido;
+import com.testedelivey.model.enuns.EnumStatusPedido;
 import com.testedelivey.model.repository.PedidoRepository;
 import com.testedelivey.service.IPedidoService;
 
